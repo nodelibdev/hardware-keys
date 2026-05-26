@@ -1,0 +1,52 @@
+{
+  "name": "hardware-keys",
+  "version": "0.11.14",
+  "description": "Hardware key backends for YubiKey PIV and macOS Secure Enclave",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "types": "index.d.ts",
+  "napi": {
+    "binaryName": "hardware-keys",
+    "targets": [
+      "aarch64-apple-darwin",
+      "x86_64-apple-darwin",
+      "x86_64-unknown-linux-gnu",
+      "x86_64-pc-windows-msvc"
+    ]
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodelibdev/hardware-keys"
+  },
+  "scripts": {
+    "build": "napi build --platform --release",
+    "build:debug": "napi build --platform"
+  },
+  "keywords": [
+    "yubikey",
+    "secure-enclave",
+    "keychain",
+    "keystore",
+    "hardware-security",
+    "macos",
+    "biometric",
+    "signing",
+    "crypto",
+    "Windows Hello",
+    "TPM 2.0",
+    "Windows TPM"
+  ],
+  "devDependencies": {
+    "@napi-rs/cli": "^2.18.0"
+  },
+  "optionalDependencies": {
+    "hardware-keys-darwin-arm64": "0.11.14",
+    "hardware-keys-darwin-x64": "0.11.14",
+    "hardware-keys-linux-x64-gnu": "0.11.14",
+    "hardware-keys-win32-x64-msvc": "0.11.14"
+  }
+}

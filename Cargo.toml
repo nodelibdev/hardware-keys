@@ -1,0 +1,43 @@
+[package]
+name = "hardware-keys"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi = { version = "2", features = ["napi4", "async", "tokio_rt"] }
+napi-derive = "2"
+tokio = "1.32.0"
+futures = "0.3.28"
+yubikey = { version = "0.8", features = ["untested"] }
+p256 = "0.13"
+der = "0.7"
+serde_json = "1"
+base64 = "0.22"
+sha2 = "0.10"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+security-framework = "2"
+security-framework-sys = "2"
+core-foundation = "0.9"
+core-foundation-sys = "0.8"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.51.1", features = [
+    "Foundation",
+    "Security_Credentials_UI",
+    "Win32_Security_Cryptography",
+    "Win32_System_Com",
+    "Win32_Foundation",
+    "Win32_System_Memory",
+    "Win32_System_WinRT",
+] }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto = true

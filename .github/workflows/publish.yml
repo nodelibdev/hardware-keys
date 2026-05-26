@@ -1,0 +1,19 @@
+name: Publish Hardware Keys
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  hardware-keys:
+    uses: ./.github/workflows/hardware-keys.yml
+    with:
+      publish: true
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    permissions:
+      contents: read
+      id-token: write

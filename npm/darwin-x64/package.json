@@ -1,0 +1,20 @@
+{
+  "name": "hardware-keys-darwin-x64",
+  "version": "0.11.14",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "main": "index.darwin-x64.node",
+  "files": [
+    "index.darwin-x64.node"
+  ],
+  "description": "Hardware key backends for macOS x64 native binary",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nodelibdev/hardware-keys"
+  }
+}

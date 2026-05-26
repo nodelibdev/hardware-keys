@@ -30,19 +30,18 @@ jobs:
       - name: Install napi-rs CLI
         run: npm install -g @napi-rs/cli
       - name: Build native module
-        working-directory: hardware-keys
         run: napi build --platform --release --target aarch64-apple-darwin
       - name: List build output
-        run: ls -la hardware-keys/*.node
+        run: ls -la ./*.node
       - name: Smoke test
-        run: node -e "const m = require('./hardware-keys/hardware-keys.darwin-arm64.node'); console.log('discover:', JSON.stringify(m.discover()))"
+        run: node -e "const m = require('./hardware-keys.darwin-arm64.node'); console.log('discover:', JSON.stringify(m.discover()))"
       - name: Stage platform package
         run: |
-          cp hardware-keys/hardware-keys.darwin-arm64.node hardware-keys/npm/darwin-arm64/index.darwin-arm64.node
+          cp hardware-keys.darwin-arm64.node npm/darwin-arm64/index.darwin-arm64.node
       - uses: actions/upload-artifact@v4
         with:
           name: hardware-keys-darwin-arm64
-          path: hardware-keys/npm/darwin-arm64/
+          path: npm/darwin-arm64/
           if-no-files-found: error
 
   build-darwin-x64:
@@ -59,17 +58,16 @@ jobs:
       - name: Install napi-rs CLI
         run: npm install -g @napi-rs/cli
       - name: Build native module
-        working-directory: hardware-keys
         run: napi build --platform --release --target x86_64-apple-darwin
       - name: List build output
-        run: ls -la hardware-keys/*.node
+        run: ls -la ./*.node
       - name: Stage platform package
         run: |
-          cp hardware-keys/hardware-keys.darwin-x64.node hardware-keys/npm/darwin-x64/index.darwin-x64.node
+          cp hardware-keys.darwin-x64.node npm/darwin-x64/index.darwin-x64.node
       - uses: actions/upload-artifact@v4
         with:
           name: hardware-keys-darwin-x64
-          path: hardware-keys/npm/darwin-x64/
+          path: npm/darwin-x64/
           if-no-files-found: error
 
   build-linux-x64-gnu:
@@ -90,19 +88,18 @@ jobs:
       - name: Install napi-rs CLI
         run: npm install -g @napi-rs/cli
       - name: Build native module
-        working-directory: hardware-keys
         run: napi build --platform --release --target x86_64-unknown-linux-gnu
       - name: List build output
-        run: ls -la hardware-keys/*.node
+        run: ls -la ./*.node
       - name: Smoke test
-        run: node -e "const m = require('./hardware-keys/hardware-keys.linux-x64-gnu.node'); console.log('discover:', JSON.stringify(m.discover()))"
+        run: node -e "const m = require('./hardware-keys.linux-x64-gnu.node'); console.log('discover:', JSON.stringify(m.discover()))"
       - name: Stage platform package
         run: |
-          cp hardware-keys/hardware-keys.linux-x64-gnu.node hardware-keys/npm/linux-x64-gnu/index.linux-x64-gnu.node
+          cp hardware-keys.linux-x64-gnu.node npm/linux-x64-gnu/index.linux-x64-gnu.node
       - uses: actions/upload-artifact@v4
         with:
           name: hardware-keys-linux-x64-gnu
-          path: hardware-keys/npm/linux-x64-gnu/
+          path: npm/linux-x64-gnu/
           if-no-files-found: error
 
   build-win32-x64-msvc:
@@ -119,21 +116,20 @@ jobs:
       - name: Install napi-rs CLI
         run: npm install -g @napi-rs/cli
       - name: Build native module
-        working-directory: hardware-keys
         run: napi build --platform --release --target x86_64-pc-windows-msvc
       - name: List build output
         shell: bash
-        run: ls -la hardware-keys/*.node
+        run: ls -la ./*.node
       - name: Smoke test
-        run: node -e "const m = require('./hardware-keys/hardware-keys.win32-x64-msvc.node'); console.log('discover:', JSON.stringify(m.discover()))"
+        run: node -e "const m = require('./hardware-keys.win32-x64-msvc.node'); console.log('discover:', JSON.stringify(m.discover()))"
       - name: Stage platform package
         shell: bash
         run: |
-          cp hardware-keys/hardware-keys.win32-x64-msvc.node hardware-keys/npm/win32-x64-msvc/index.win32-x64-msvc.node
+          cp hardware-keys.win32-x64-msvc.node npm/win32-x64-msvc/index.win32-x64-msvc.node
       - uses: actions/upload-artifact@v4
         with:
           name: hardware-keys-win32-x64-msvc
-          path: hardware-keys/npm/win32-x64-msvc/
+          path: npm/win32-x64-msvc/
           if-no-files-found: error
 
   publish:
@@ -156,32 +152,32 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: hardware-keys-darwin-arm64
-          path: hardware-keys/npm/darwin-arm64/
+          path: npm/darwin-arm64/
       - uses: actions/download-artifact@v4
         with:
           name: hardware-keys-darwin-x64
-          path: hardware-keys/npm/darwin-x64/
+          path: npm/darwin-x64/
       - uses: actions/download-artifact@v4
         with:
           name: hardware-keys-linux-x64-gnu
-          path: hardware-keys/npm/linux-x64-gnu/
+          path: npm/linux-x64-gnu/
       - uses: actions/download-artifact@v4
         with:
           name: hardware-keys-win32-x64-msvc
-          path: hardware-keys/npm/win32-x64-msvc/
+          path: npm/win32-x64-msvc/
 
       - name: Publish platform packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          VERSION=$(node -p "require('./hardware-keys/package.json').version")
+          VERSION=$(node -p "require('./package.json').version")
           for pkg in darwin-arm64 darwin-x64 linux-x64-gnu win32-x64-msvc; do
             published=$(npm view "hardware-keys-$pkg" version 2>/dev/null || echo "0.0.0")
             if [ "$published" = "$VERSION" ]; then
               echo "Skipping hardware-keys-$pkg@$VERSION (already published)"
             else
               echo "Publishing hardware-keys-$pkg@$VERSION (npm has $published)..."
-              (cd hardware-keys/npm/$pkg && npm publish --provenance --access public)
+              (cd npm/$pkg && npm publish --provenance --access public)
             fi
           done
 
@@ -189,12 +185,11 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          VERSION=$(node -p "require('./hardware-keys/package.json').version")
+          VERSION=$(node -p "require('./package.json').version")
           published=$(npm view "hardware-keys" version 2>/dev/null || echo "0.0.0")
           if [ "$published" = "$VERSION" ]; then
             echo "Skipping hardware-keys@$VERSION (already published)"
           else
             echo "Publishing hardware-keys@$VERSION (npm has $published)..."
-            cd hardware-keys
             npm publish --provenance --access public
           fi

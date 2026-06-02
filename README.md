@@ -78,7 +78,7 @@ deleteKey('yubikey-piv', '9e')
 | `algorithm` | `string` | ✓ | — | `"ES256"` or `"RS256"` (YubiKey only) |
 | `label` | `string` | SE / TPM | — | Key label used for lookup and deletion. For TPM, stored as `hwkey-<label>` in CNG |
 | `permanent` | `boolean` | — | `false` | Persist key to keychain (Secure Enclave only). Requires binary codesigned with `keychain-access-groups` entitlement. Ignored for TPM (CNG always persists) |
-| `requireBiometric` | `boolean` | — | `false` | Secure Enclave: require Touch ID / Face ID on every signing operation (`kSecAccessControlBiometryAny`). Windows TPM: require Windows Hello via `NCRYPT_UI_POLICY_PROPERTY`. Key creation fails if biometric policy cannot be applied |
+| `requireBiometric` | `boolean` | — | `false` | Secure Enclave: require Touch ID / Face ID on every signing operation (`kSecAccessControlBiometryAny`). Windows TPM: require Windows Hello via `UserConsentVerifier` before every signing operation. When `false`, the key is usable programmatically with no user interaction |
 | `replaceIfExists` | `boolean` | — | `false` | Delete existing key with the same label before creating. If `false` and label exists, the existing key is loaded and returned (get-or-create) |
 
 ---
@@ -197,7 +197,7 @@ Keys are created inside the TPM via the **Microsoft Platform Crypto Provider** (
 
 Key naming in CNG: `hwkey-<label>` (e.g. `hwkey-signing-key`).
 
-When `requireBiometric: true`, `NCRYPT_UI_POLICY_PROPERTY` is set with `NCRYPT_UI_PROTECT_KEY_FLAG`, requiring Windows Hello authentication before every signing operation. Key creation will **fail** rather than silently creating an unprotected key if the policy cannot be applied.
+When `requireBiometric: true`, Windows Hello is prompted via `Windows.Security.Credentials.UI.UserConsentVerifier` before every signing operation. `signHash` will **fail** if Windows Hello is not configured on the device, rather than silently creating a key that cannot be used.
 
 ```ts
 // Basic usage — no Windows Hello

@@ -544,10 +544,41 @@ fn load_se_key(label: &str) -> Result<SecKey> {
     };
 
     if status != 0 || result.is_null() {
-        return Err(Error::from_reason(format!(
-            "Secure Enclave key not found for label: {} (status: {})",
-            label, status
-        )));
+        let msg = match status {
+            // Known SE unavailable codes
+            -25308 => format!(
+                "Secure Enclave is not available: device is locked or just woke from sleep \
+                 (errSecInteractionNotAllowed: {}). Please try again in a moment.",
+                status
+            ),
+            -25293 => format!(
+                "Secure Enclave is not ready: authentication failed transiently \
+                 (errSecAuthFailed: {}). Please try again in a moment.",
+                status
+            ),
+            -26276 | -25299 => format!(
+                "Secure Enclave is temporarily unavailable \
+                 (errSecNotAvailable: {}). Please try again in a moment.",
+                status
+            ),
+            -25243 => format!(
+                "Secure Enclave denied access to key '{}' \
+                 (errSecNoAccessForItem: {}). The device may be locked.",
+                label, status
+            ),
+            // Key genuinely not found
+            -25300 => format!(
+                "Secure Enclave key not found for label: '{}' (errSecItemNotFound: {})",
+                label, status
+            ),
+            // Unknown — include status code so caller can diagnose
+            _ => format!(
+                "Secure Enclave key lookup failed for label: '{}' (status: {}). \
+                 If this follows a sleep/wake cycle, please try again in a moment.",
+                label, status
+            ),
+        };
+        return Err(Error::from_reason(msg));
     }
 
     Ok(unsafe { SecKey::wrap_under_create_rule(result as *mut _) })

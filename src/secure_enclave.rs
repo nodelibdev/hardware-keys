@@ -64,7 +64,7 @@ fn secure_enclave_available() -> bool {
             error: *mut core_foundation_sys::error::CFErrorRef,
         ) -> core_foundation_sys::base::CFTypeRef;
 
-        static kSecAttrAccessibleWhenUnlockedThisDeviceOnly:
+        static kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly:
             core_foundation_sys::string::CFStringRef;
     }
 
@@ -75,7 +75,7 @@ fn secure_enclave_available() -> bool {
     let access_control = unsafe {
         SecAccessControlCreateWithFlags(
             std::ptr::null(),
-            kSecAttrAccessibleWhenUnlockedThisDeviceOnly as core_foundation_sys::base::CFTypeRef,
+            kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly as core_foundation_sys::base::CFTypeRef,
             SEC_ACCESS_CONTROL_PRIVATE_KEY_USAGE,
             &mut error,
         )
@@ -418,7 +418,7 @@ fn create_se_key(label: &str, permanent: bool, require_biometric: bool) -> Resul
                 error: *mut core_foundation_sys::error::CFErrorRef,
             ) -> core_foundation_sys::base::CFTypeRef;
 
-            static kSecAttrAccessibleWhenUnlockedThisDeviceOnly:
+            static kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly:
                 core_foundation_sys::string::CFStringRef;
         }
 
@@ -434,7 +434,7 @@ fn create_se_key(label: &str, permanent: bool, require_biometric: bool) -> Resul
         let acl = unsafe {
             SecAccessControlCreateWithFlags(
                 std::ptr::null(),
-                kSecAttrAccessibleWhenUnlockedThisDeviceOnly as core_foundation_sys::base::CFTypeRef,
+                kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly as core_foundation_sys::base::CFTypeRef,
                 flags,
                 &mut error,
             )

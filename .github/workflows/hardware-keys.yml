@@ -119,7 +119,7 @@ jobs:
         run: napi build --platform --release --target x86_64-pc-windows-msvc
       - name: Assert no VC++ runtime dependency
         shell: bash
-        run: python scripts/check-win-imports.py hardware-keys.win32-x64-msvc.node
+        run: python scripts/check-win-import.py hardware-keys.win32-x64-msvc.node
       - name: List build output
         shell: bash
         run: ls -la ./*.node
